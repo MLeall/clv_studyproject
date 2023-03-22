@@ -1,0 +1,119 @@
+---
+title: "clv_calculator"
+output: html_document
+date: "2023-03-15"
+Code by: Matheus Leal Leone - TI1014894
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About CLV
+
+Customer lifetime value (CLV) is a business metric that measures how much a business can plan to earn from the average customer over the course of the relationship.
+
+It's possible to calculate the CLV by knowing the average revenue per costumer (a typical customer is a person that shops regularly) and the average lifetime of a costumer.
+
+## Challenge
+
+As a Tim Horton's costumer, I started drinking coffee since January 2020. In average, I spend \$6.45 per visit, 3 times during the week until now. Now, I have to calculate my CLV.
+
+## About the solution
+
+As told before, I spend, on average, \$6.45 per visit, 3 times per week, which give us a total of \$19.35 per week. Considering that 1 month has (on average) 4 weeks, I spend \$77.4 per full month. I built a simple CSV file to be our guide for this calculation.
+
+## Creating the DataFrame
+
+```{r}
+df = data.frame(read.csv("coffe_data.csv", sep = ";"))
+df
+```
+
+## CLV Formula
+
+Now that we have our DataFrame, we need to calculate de CLV. For that, we'll need to calculate my average annual cost and my lifetime as a costumer. Since I started to be a Tim Horton's costumer in January 2020, my total time in years, until now, is around 3.3 years (2020, 2021, 2023 and 3.5 months).
+
+```{r}
+average_cost <- sum(df$cost)
+total_time <- 3.3
+
+average_cost
+```
+
+## My CLV
+
+With all values required, we just need to calculate my CLV.
+
+```{r}
+clv <- average_cost * total_time
+cat("My Costumer Lifetime Value is $", clv)
+```
+
+## Increasing the profit margin
+
+Following the instructions, let's see what happens to the CLV if we increase the profit margin by 25%.
+
+```{r}
+new_average_cost <- average_cost * 1.25
+new_average_cost
+```
+
+```{r}
+clv <- new_average_cost * total_time
+cat("My new Costumer Lifetime Value is $", clv)
+```
+
+## Another customer example
+
+Now, let's evaluate the CLV for a customer that spends more than \$2000 in a period of two years. For that, I'm going to use a CSV file available on GitHub (customer_eval) to find someone who fits our requirements.
+
+```{r}
+new_df <- data.frame(read.csv("customer_eval.csv"))
+new_df
+```
+
+By taking a look in this new DataFrame, we can't see clearly how many clients did spend more than \$2000. We can create a filter to find out which one of this is OK with our requirements. First, I'll create a matrix with unique values.
+
+```{r}
+unique_id <- matrix(unique(new_df$CustomerID), 7)
+unique_id
+```
+
+With a loop, it's possible to filter each of these values to see if they match what we need.
+
+```{r}
+for (i in unique_id){
+  customer_df <- new_df[new_df$CustomerID == i,]
+  customer_df <- na.omit(customer_df)
+  ifelse(sum(customer_df$Quantity * customer_df$UnitPrice) >= 2000, print(i), next)
+}
+
+```
+
+Now that we know that customers "16029" and "16210" did spend more than \$2000, we can proceed.
+
+```{r}
+customer_df <- new_df[new_df$CustomerID == 16210,]
+customer_df <- na.omit(customer_df)
+customer_df
+
+```
+
+Now we just need to sum the values.
+
+```{r}
+total_cost <- sum(customer_df$Quantity * customer_df$UnitPrice)
+total_cost
+```
+
+## CLV
+
+The dataset is showing us that this client spent the total_cost value (above) in one day. For study purposes and to fulfill what has been asked in the exercise, let's pretend that this customer spent this value in 2.5 years.
+
+The CLV for the customer that holds the ID 16210 would be:
+
+```{r}
+clv <- total_cost * 2.5
+cat("CLIENT ID 16210 CLV's: $", clv)
+```

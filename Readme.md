@@ -1,0 +1,1 @@
+Project created to practice R and data analysis with a simple dataset created by me and a provided dataset.
